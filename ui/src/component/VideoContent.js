@@ -1,11 +1,11 @@
-import React, {useState} from 'react';
-import { makeStyles } from '@material-ui/core/styles';
+import React, { useState } from 'react';
+import { makeStyles, useTheme  } from '@material-ui/core/styles';
 import Card from '@material-ui/core/Card';
 import CardContent from '@material-ui/core/CardContent';
 import Button from '@material-ui/core/Button';
-import { TextField , MenuItem} from '@material-ui/core';
+import { TextField, MenuItem, Typography, Slider, Chip, Select, InputLabel, Input } from '@material-ui/core';
 import CardMedia from '@material-ui/core/CardMedia';
-import {CATEGORIES, USERS} from './constants';
+import { CATEGORIES, TAGS } from './constants';
 import firebase from './firebase'
 
 const useStyles = makeStyles((theme) => ({
@@ -26,37 +26,81 @@ const useStyles = makeStyles((theme) => ({
   textArea: {
     width: '100%'
   },
-  form : {
+  form: {
     '& .MuiTextField-root': {
       margin: theme.spacing(1),
       width: '85vw',
     },
-    display : 'flex',
-    flexDirection : 'column',
-    justifyContent : 'center'
+    display: 'flex',
+    flexDirection: 'column',
+    justifyContent: 'center'
+  },
+  typography: {
+    margin: theme.spacing(1),
+    width: '85vw',
+  },
+  slider: {
+    margin: theme.spacing(1),
+    width: '85vw'
+  },
+  chips: {
+    display: 'flex',
+    flexWrap: 'wrap',
+  },
+  chip: {
+    margin: 2,
+  },
+  select : {
+    marginBottom: theme.spacing(2)
   }
 }));
+
+const ITEM_HEIGHT = 48;
+const ITEM_PADDING_TOP = 8;
+const MenuProps = {
+  PaperProps: {
+    style: {
+      maxHeight: ITEM_HEIGHT * 4.5 + ITEM_PADDING_TOP,
+      width: 250,
+    },
+  },
+};
+
+function getStyles(tag, tags, theme) {
+  return {
+    fontWeight:
+      tags.indexOf(tag) === -1
+        ? theme.typography.fontWeightRegular
+        : theme.typography.fontWeightMedium,
+  };
+}
 
 const VideoContent = (props) => {
   const classes = useStyles();
   const [category, setCategory] = useState('')
   const [description, setDescription] = useState('');
-  const [user, setUser] = useState('')
+  const [rating, setRating] = useState(0);
+  const [tags, setTags]= useState([])
+
+  const theme = useTheme();
   const handleChange = (e) => {
     setCategory(e.target.value)
   }
   const width = '400';
 
-  const {videoData} = props;
+  const { videoData } = props;
 
   const submitClick = () => {
     const postBody = {
       ...videoData,
+      modifiedBy: [...new Set([...videoData.modifiedBy, props.user])],
       category,
-      description, 
-      user
+      description,
+      user: props.user,
+      rating,
+      tags
     }
-    const {key, ...rest} = postBody;
+    const { key, ...rest } = postBody;
     const db = firebase.database();
     const ref = db.ref('clips');
     ref
@@ -65,7 +109,13 @@ const VideoContent = (props) => {
       .then(props.clearContent)
   }
 
-  if(videoData) {
+  const handleChangeMultiple = (event) => {
+    const { value } = event.target;
+    setTags(value);
+  };
+
+  if (videoData) {
+
     return (
       <Card className={classes.root} variant="outlined">
         <CardMedia
@@ -74,7 +124,7 @@ const VideoContent = (props) => {
         >
           <iframe title="Game Video"
             width={width} height="360" frameBorder="0"
-            src="https://mega.nz/embed/sdMBVSaS#rEDMh8moE1KKtZu0Zv7YVdAFu3hCkVOwuN2RDKLDiLU!1a" allowFullScreen allow="play;" />
+            src={videoData.url} allowFullScreen allow="play;" />
         </CardMedia>
         <CardContent>
           <form className={classes.form} noValidate autoComplete="off">
@@ -100,21 +150,45 @@ const VideoContent = (props) => {
                 </MenuItem>
               ))}
             </TextField>
-            <TextField
-              id="outlined-select-category"
-              select
-              label="User"
-              value={user}
-              onChange={(e) => setUser(e.target.value)}
-              helperText="Please select user"
-              variant="outlined"
+            <Typography id="discrete-slider" gutterBottom className={classes.typography}>
+              Rating
+            </Typography>
+            <Slider
+              className={classes.slider}
+              defaultValue={0}
+              aria-labelledby="discrete-slider"
+              valueLabelDisplay="auto"
+              step={1}
+              marks
+              min={0}
+              max={10}
+              value={rating}
+              onChange={(e, value) => setRating(value)}
+            />
+            <InputLabel id="demo-mutiple-chip-label">Tags</InputLabel>
+            <Select
+              className={classes.select}
+              labelId="demo-mutiple-chip-label"
+              id="demo-mutiple-chip"
+              multiple
+              value={tags}
+              onChange={handleChangeMultiple}
+              input={<Input id="select-multiple-chip" />}
+              renderValue={(selected) => (
+                <div className={classes.chips}>
+                  {selected.map((value) => (
+                    <Chip key={value} label={value} className={classes.chip} />
+                  ))}
+                </div>
+              )}
+              MenuProps={MenuProps}
             >
-              {USERS.map((option) => (
-                <MenuItem key={option.value} value={option.value}>
-                  {option.label}
+              {TAGS.map((tag) => (
+                <MenuItem key={tag} value={tag} style={getStyles(tag, tags, theme)}>
+                  {tag}
                 </MenuItem>
               ))}
-            </TextField>
+            </Select>
             <Button variant="contained" color="primary" onClick={submitClick}>Submit</Button>
           </form>
         </CardContent>

@@ -12,12 +12,13 @@ const ContentPage = (props) => {
         db.ref('clips')
             .orderByChild("category").equalTo("NA").on('value', (snapshot) => {
                 setData(snapshot.val())
-            })
+            })      
+
     }, [refetch])
     return <Fragment>
         <FilterContent data={data} setVideoData={setVideoData} />
         {
-            videoData && <VideoContent videoData={videoData} clearContent={() => {
+            videoData && <VideoContent videoData={videoData} user={props.user} clearContent={() => {
                 setVideoData(null);
                 setRefetch(!refetch)
             }} />

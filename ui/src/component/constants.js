@@ -16,3 +16,7 @@ export const CATEGORIES = [
     getOption('Selected', 'SELECTED'),
     getOption('Rejected', 'REJECTED')
   ]
+
+export const TAGS = [
+   'rat', 'killleader', 'jump'
+]
