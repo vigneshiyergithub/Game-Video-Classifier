@@ -1,10 +1,9 @@
 import React, {useState} from 'react';
 import { makeStyles } from '@material-ui/core/styles';
 import Card from '@material-ui/core/Card';
-import CardActions from '@material-ui/core/CardActions';
 import CardContent from '@material-ui/core/CardContent';
 import Button from '@material-ui/core/Button';
-import { Container, Typography, TextField , MenuItem, FormHelperText} from '@material-ui/core';
+import { TextField , MenuItem} from '@material-ui/core';
 import CardMedia from '@material-ui/core/CardMedia';
 import {CATEGORIES, USERS} from './constants';
 import firebase from './firebase'
@@ -73,7 +72,7 @@ const VideoContent = (props) => {
           className={classes.media}
           title="Game Video"
         >
-          <iframe
+          <iframe title="Game Video"
             width={width} height="360" frameBorder="0"
             src="https://mega.nz/embed/sdMBVSaS#rEDMh8moE1KKtZu0Zv7YVdAFu3hCkVOwuN2RDKLDiLU!1a" allowFullScreen allow="play;" />
         </CardMedia>
@@ -81,7 +80,7 @@ const VideoContent = (props) => {
           <form className={classes.form} noValidate autoComplete="off">
             <TextField
               className={classes.textArea}
-              id="outlined-basic" label="Outlined" variant="outlined"
+              id="outlined-basic" variant="outlined"
               label="Description" multiline={true}
               value={description}
               onChange={(e) => setDescription(e.target.value)}
