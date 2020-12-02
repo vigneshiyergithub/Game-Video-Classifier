@@ -91,9 +91,10 @@ const VideoContent = (props) => {
   const { videoData } = props;
 
   const submitClick = () => {
+    const modifiedBy = videoData.modifiedBy ? videoData.modifiedBy : [];
     const postBody = {
       ...videoData,
-      modifiedBy: [...new Set([...videoData.modifiedBy, props.user])],
+      modifiedBy: [...new Set([...modifiedBy, props.user])],
       category,
       description,
       user: props.user,

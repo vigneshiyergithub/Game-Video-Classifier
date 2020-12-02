@@ -25,6 +25,8 @@ const useStyles = makeStyles((theme) => ({
   }));
 
 
+ 
+
 const FilterContent = (props) => {
     const classes = useStyles();
     const [streamer,setStreamer] = useState('');
@@ -34,8 +36,9 @@ const FilterContent = (props) => {
     let dataList = [];
     if(data) {
       dataList = extractData(data)
-
-      streamers = dataList.map(item => getOption(item.streamer, item.streamer));
+      const streamerList = [...new Set(dataList.map(item => item.streamer))];
+      streamers = streamerList.map(item => getOption(item, item));
+      console.log(streamers)
     }
 
     const buttonClick = (e) => {
